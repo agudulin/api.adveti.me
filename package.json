@@ -1,0 +1,23 @@
+{
+  "name": "api.adveti.me",
+  "version": "0.0.0",
+  "main": "index.js",
+  "repository": {},
+  "author": "Alexander Gudulin <alexandr.gudulin@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "micro": "^7.0.3",
+    "micro-api": "^0.0.12",
+    "micro-cors": "^0.0.1"
+  },
+  "scripts": {
+    "deploy": "now --alias",
+    "dev": "NODE_ENV=development node ./",
+    "start": "NODE_ENV=production node ./"
+  },
+  "now": {
+    "aliases": [
+      "api.adveti.me"
+    ]
+  }
+}
