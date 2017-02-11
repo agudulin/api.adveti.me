@@ -8,7 +8,8 @@
   "dependencies": {
     "micro": "^7.0.3",
     "micro-api": "^0.0.12",
-    "micro-cors": "^0.0.1"
+    "micro-cors": "^0.0.1",
+    "micro-visualize": "^2.0.0"
   },
   "scripts": {
     "deploy": "now --alias",

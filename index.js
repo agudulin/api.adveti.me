@@ -1,10 +1,13 @@
-const api = require('./api')
 const micro = require('micro')
 const cors = require('micro-cors')()
+const visualize = require('micro-visualize')
+const api = require('./api')
+
+const compose = (...fns) => x => fns.reduceRight((v, f) => f(v), x)
 
 const port = 3001
 
-const app = micro(cors(api))
+const app = compose(micro, visualize, cors)(api)
 
 app.listen(port)
 
