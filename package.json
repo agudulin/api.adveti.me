@@ -12,12 +12,12 @@
     "micro-visualize": "^2.0.0"
   },
   "scripts": {
-    "deploy": "now --alias",
+    "deploy": "now && now alias",
     "dev": "NODE_ENV=development node ./",
     "start": "NODE_ENV=production node ./"
   },
   "now": {
-    "aliases": [
+    "alias": [
       "api.adveti.me"
     ]
   }
