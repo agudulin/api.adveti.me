@@ -1,12 +1,15 @@
 const microApi = require('micro-api')
-const data = require('./data.json')
+
+const { getSeason, grabSeason } = require('./handlers')
 
 const api = microApi([{
   method: 'get',
   path: '/season/:season',
-  handler: ({ params: { season } }) => (
-    data.episodes.filter(e => e.season === parseInt(season, 10))
-  )
+  handler: getSeason
+}, {
+  method: 'get',
+  path: '/grab/season/:season',
+  handler: grabSeason
 }])
 
 module.exports = api
