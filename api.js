@@ -1,15 +1,15 @@
 const microApi = require('micro-api')
 
-const { getSeason, grabSeason } = require('./handlers')
+const handlers = require('./handlers')
 
 const api = microApi([{
   method: 'get',
   path: '/season/:season',
-  handler: getSeason
+  handler: handlers.getSeason
 }, {
   method: 'get',
   path: '/grab/season/:season',
-  handler: grabSeason
+  handler: handlers.noop // handlers.grabSeason
 }])
 
 module.exports = api
