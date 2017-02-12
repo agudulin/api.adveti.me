@@ -21,11 +21,13 @@ const parseSeasonPage = (season) => new Promise((resolve) => {
 const parseEpisodePage = ({ name, url }) => new Promise((resolve) => {
   const tabsSelector = '.type_page_content .tabs_widget'
   const voiceTitleSelector = '.elem span'
+  const posterSelector = '.page_content p img'
 
   return request(url).then(body => {
     const $ = cheerio.load(body)
-    const tabs = $(tabsSelector).last()
 
+    const poster = $(posterSelector).attr('src')
+    const tabs = $(tabsSelector).last()
     const titles = tabs.find(voiceTitleSelector)
       .map((_, title) => $(title).text())
       .get()
@@ -42,7 +44,7 @@ const parseEpisodePage = ({ name, url }) => new Promise((resolve) => {
       url: links[i]
     }))
 
-    resolve({ name, url, videos })
+    resolve({ name, url, poster, videos })
   })
 })
 
