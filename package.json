@@ -12,8 +12,10 @@
     "micro-api": "^0.0.12",
     "micro-cors": "^0.0.1",
     "micro-visualize": "^2.0.0",
+    "node-fetch": "^1.6.3",
     "request": "^2.79.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "send": "^0.14.2"
   },
   "scripts": {
     "deploy": "now && now alias",

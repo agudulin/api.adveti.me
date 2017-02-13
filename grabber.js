@@ -1,5 +1,32 @@
+const fs = require('fs')
+const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const request = require('request-promise')
+
+const saveSeasonOnDisk = (season, data) => {
+  const filename = `./data/${season}/data.json`
+
+  fs.writeFile(filename, JSON.stringify(data), err => {
+    if (err) console.error(`ERROR: Can't write the file ${filename} on disk: ${err}`)
+  })
+}
+
+const savePosterOnDisk = (season, id, url) => new Promise((resolve) => {
+  const dummy = 'data/dummy.jpg'
+  const filename = `data/${season}/${id}.jpg`
+
+  if (!url) return resolve(dummy)
+  if (fs.existsSync(filename)) return resolve(filename)
+
+  console.log('> Downloading...', season, id, url)
+
+  fetch(url).then(res => {
+    const file = fs.createWriteStream(filename)
+
+    res.body.pipe(file)
+    file.on('finish', () => file.close(() => resolve(filename)))
+  })
+})
 
 const parseSeasonPage = (season) => new Promise((resolve) => {
   const url = `http://advetime.ru/category/sezon-${season}`
@@ -10,15 +37,19 @@ const parseSeasonPage = (season) => new Promise((resolve) => {
     const links = $(linkSelector)
 
     const episodes = links.map((_, link) => ({
-      name: $(link).text(),
+      title: $(link).text(),
       url: $(link).attr('href')
-    })).get()
+    })).get().map(({ title, url }) => {
+      const [, id, name] = title.match(/(.+?)\s*-\s*(.+)/)
+
+      return { id, name, season, url }
+    })
 
     resolve(episodes)
   })
 })
 
-const parseEpisodePage = ({ name, url }) => new Promise((resolve) => {
+const parseEpisodePage = ({ id, name, season, url }) => new Promise((resolve) => {
   const tabsSelector = '.type_page_content .tabs_widget'
   const voiceTitleSelector = '.elem span'
   const posterSelector = '.page_content p img'
@@ -26,7 +57,7 @@ const parseEpisodePage = ({ name, url }) => new Promise((resolve) => {
   return request(url).then(body => {
     const $ = cheerio.load(body)
 
-    const poster = $(posterSelector).attr('src')
+    const posterUrl = $(posterSelector).attr('src')
     const tabs = $(tabsSelector).last()
     const titles = tabs.find(voiceTitleSelector)
       .map((_, title) => $(title).text())
@@ -44,14 +75,19 @@ const parseEpisodePage = ({ name, url }) => new Promise((resolve) => {
       url: links[i]
     }))
 
-    resolve({ name, url, poster, videos })
+    savePosterOnDisk(season, id, posterUrl).then(poster =>
+      resolve({ id, name, url, poster, videos })
+    )
   })
 })
 
 const parseFullSeason = (season) => new Promise((resolve) => {
-  parseSeasonPage(season).then(episodes =>
-    Promise.all(episodes.map(parseEpisodePage)).then(resolve)
-  )
+  parseSeasonPage(season).then(episodes => {
+    Promise.all(episodes.map(parseEpisodePage)).then(episodesList => {
+      resolve(episodesList)
+      saveSeasonOnDisk(season, episodesList)
+    })
+  })
 })
 
 module.exports = { parseFullSeason }

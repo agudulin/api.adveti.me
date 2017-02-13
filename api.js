@@ -8,8 +8,12 @@ const api = microApi([{
   handler: handlers.getSeason
 }, {
   method: 'get',
-  path: '/grab/season/:season',
+  path: '/season/:season/grab',
   handler: handlers.noop // handlers.grabSeason
+}, {
+  method: 'get',
+  path: '/season/:season/episode/:episode/poster.jpg',
+  handler: handlers.getPoster
 }])
 
 module.exports = api
