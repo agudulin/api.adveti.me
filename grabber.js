@@ -3,17 +3,12 @@ const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const request = require('request-promise')
 
-const saveSeasonOnDisk = (season, data) => {
-  const filename = `./data/${season}/data.json`
-
-  fs.writeFile(filename, JSON.stringify(data), err => {
-    if (err) console.error(`ERROR: Can't write the file ${filename} on disk: ${err}`)
-  })
-}
+const { setSeasonData } = require('./db')
+const storage = require('./storage')
 
 const savePosterOnDisk = (season, id, url) => new Promise((resolve) => {
-  const dummy = 'data/dummy.jpg'
-  const filename = `data/${season}/${id}.jpg`
+  const dummy = './data/dummy.jpg'
+  const filename = `./data/${season}/${id}.jpg`
 
   if (!url) return resolve(dummy)
   if (fs.existsSync(filename)) return resolve(filename)
@@ -72,12 +67,14 @@ const parseEpisodePage = ({ id, name, season, url }) => new Promise((resolve) =>
 
     const videos = titles.map((title, i) => ({
       name: title,
-      url: links[i]
+      url: links[i] || ''
     }))
 
-    savePosterOnDisk(season, id, posterUrl).then(poster =>
-      resolve({ id, name, url, poster, videos })
-    )
+    savePosterOnDisk(season, id, posterUrl).then(filename => {
+      storage.upload(filename, `seasons/${season}/${id}.jpg`).then(poster =>
+        resolve({ id, name, url, poster, videos })
+      )
+    })
   })
 })
 
@@ -85,7 +82,7 @@ const parseFullSeason = (season) => new Promise((resolve) => {
   parseSeasonPage(season).then(episodes => {
     Promise.all(episodes.map(parseEpisodePage)).then(episodesList => {
       resolve(episodesList)
-      saveSeasonOnDisk(season, episodesList)
+      setSeasonData(season, episodesList)
     })
   })
 })

@@ -7,15 +7,16 @@
   "author": "Alexander Gudulin <alexandr.gudulin@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/storage": "^0.7.0",
     "cheerio": "^0.22.0",
+    "firebase": "^3.6.9",
     "micro": "^7.0.3",
     "micro-api": "^0.0.12",
     "micro-cors": "^0.0.1",
     "micro-visualize": "^2.0.0",
     "node-fetch": "^1.6.3",
     "request": "^2.79.0",
-    "request-promise": "^4.1.1",
-    "send": "^0.14.2"
+    "request-promise": "^4.1.1"
   },
   "scripts": {
     "deploy": "now && now alias",

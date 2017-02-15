@@ -1,12 +1,8 @@
-const stream = require('send')
-
+const { getSeasonData } = require('./db')
 const { parseFullSeason } = require('./grabber')
 
-const getPoster = ({ req, res, params: { season, episode } }) => (
-  stream(req, `./data/${season}/${episode}.jpg`, { maxAge: '1y' }).pipe(res)
-)
 const grabSeason = ({ params: { season } }) => parseFullSeason(season)
-const getSeason = ({ params: { season } }) => require(`./data/${season}/data.json`)
+const getSeason = ({ params: { season } }) => getSeasonData(season)
 const noop = () => {}
 
-module.exports = { getPoster, getSeason, grabSeason, noop }
+module.exports = { getSeason, grabSeason, noop }
