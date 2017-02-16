@@ -1,4 +1,5 @@
 const fs = require('fs')
+const im = require('imagemagick')
 const fetch = require('node-fetch')
 const cheerio = require('cheerio')
 const request = require('request-promise')
@@ -6,21 +7,31 @@ const request = require('request-promise')
 const { setSeasonData } = require('./db')
 const storage = require('./storage')
 
-const savePosterOnDisk = (season, id, url) => new Promise((resolve) => {
+const savePosterOnDisk = (season, id, url) => new Promise((resolve, reject) => {
   const dummy = './data/dummy.jpg'
   const filename = `./data/${season}/${id}.jpg`
 
   if (!url) return resolve(dummy)
   if (fs.existsSync(filename)) return resolve(filename)
 
-  console.log('> Downloading...', season, id, url)
-
-  fetch(url).then(res => {
+  const saveFile = ({ body }) => {
     const file = fs.createWriteStream(filename)
 
-    res.body.pipe(file)
-    file.on('finish', () => file.close(() => resolve(filename)))
-  })
+    body.pipe(file)
+    file.on('finish', () => {
+      file.close(() => {
+        im.resize({ srcPath: filename, dstPath: filename, width: 640, quality: 0.5 }, (err) => {
+          if (err) reject(err)
+
+          resolve(filename)
+        })
+      })
+    })
+  }
+
+  console.log('> Downloading...', season, id, url)
+
+  fetch(url).then(saveFile)
 })
 
 const parseSeasonPage = (season) => new Promise((resolve) => {
