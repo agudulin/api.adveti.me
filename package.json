@@ -16,7 +16,7 @@
     "micro-cors": "^0.0.1",
     "micro-visualize": "^3.0.0",
     "node-fetch": "^1.6.3",
-    "request": "^2.81.0",
+    "request": "^2.88.0",
     "request-promise": "^4.2.0"
   },
   "scripts": {
